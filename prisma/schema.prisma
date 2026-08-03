@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Visitor {
+  id         String   @id @default(uuid())
+  ipHash     String?  @map("ip_hash")
+  userAgent  String?  @map("user_agent")
+  referrer   String?
+  pagePath   String   @map("page_path")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([pagePath])
+  @@map("visitors")
+}
+
+model ToolUsage {
+  id             String   @id @default(uuid())
+  toolType       String   @map("tool_type")
+  mode           String?
+  wordsProcessed Int?     @map("words_processed")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([toolType])
+  @@index([createdAt])
+  @@map("tool_usage")
+}
+
+model Receipt {
+  id             String   @id @default(uuid())
+  receiptNumber  String   @unique @map("receipt_number")
+  currencyType   String   @map("currency_type")
+  amount         Decimal  @db.Decimal(18, 8)
+  senderName     String   @map("sender_name")
+  receiverName   String   @map("receiver_name")
+  description    String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("receipts")
+}
