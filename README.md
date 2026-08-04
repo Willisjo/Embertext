@@ -389,9 +389,38 @@ Admin panel: `http://localhost:3000/admin/your-secret-token`
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `ADMIN_SECRET_TOKEN` | Yes | Secret token for admin access |
-| `NEXT_PUBLIC_ADMIN_SECRET` | Yes | Same token, exposed to client (for route validation) |
+| `NEXT_PUBLIC_ADMIN_SECRET` | Yes | Same value as `ADMIN_SECRET_TOKEN`, exposed to client |
+| `ADMIN_USERNAME` | No | Admin username (defaults to `admin`) |
+| `ADMIN_PASSWORD_HASH` | No | HMAC hash of admin password, generated using `ADMIN_SECRET_TOKEN` |
 | `NEXT_PUBLIC_APP_URL` | No | Your app URL (for SEO/meta) |
+| `GROQ_API_KEY` | No | Groq API key for AI features |
+| `NARAROUTER_API_KEY` | No | NaraRouter API key for image detection |
 | `COINGECKO_API_KEY` | No | Optional API key for higher rate limits |
+
+## Generating Admin Credentials
+
+Before deploying, generate the admin secret token, the matching password hash, and the public secret:
+
+```bash
+# Step 1: Generate a secure random admin secret token
+TOKEN=$(openssl rand -base64 48)
+echo "ADMIN_SECRET_TOKEN: $TOKEN"
+echo "NEXT_PUBLIC_ADMIN_SECRET: $TOKEN"
+```
+
+```bash
+# Step 2: Generate the admin password hash (replace YOUR_TOKEN and your-password)
+# The token MUST be the same value used above
+node -e "console.log(require('crypto').createHmac('sha256', 'YOUR_TOKEN').update('your-password').digest('hex'))"
+echo "ADMIN_PASSWORD_HASH: <paste the output here>"
+```
+
+```bash
+# Step 3: (Optional) Set a custom admin username
+echo "ADMIN_USERNAME: admin"
+```
+
+**Important**: The `ADMIN_SECRET_TOKEN` used in Step 2 must exactly match the one set in your environment. Both `ADMIN_SECRET_TOKEN` and `NEXT_PUBLIC_ADMIN_SECRET` must share the same value.
 
 ## Admin Dashboard
 
