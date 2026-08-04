@@ -34,3 +34,6 @@ prisma/migrations/
 # Misc
 *.log
 .vercel
+
+.vercel
+.env*
