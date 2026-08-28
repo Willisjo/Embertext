@@ -18,10 +18,10 @@ function getProviders(): ProviderConfig[] {
 
   if (GROQ_API_KEY) {
     providers.push({
-      name: "Groq AI (Llama 3.1)",
+      name: "Groq AI (GPT-OSS 20B)",
       url: "https://api.groq.com/openai/v1/chat/completions",
       apiKey: GROQ_API_KEY,
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
     });
   }
 
