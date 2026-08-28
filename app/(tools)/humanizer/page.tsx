@@ -14,7 +14,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
-import { type HumanizerMode, getModeDescription } from "@/lib/humanizer-engine";
+import { type HumanizerMode, getModeDescription, humanizeText } from "@/lib/humanizer-engine";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -57,30 +57,18 @@ export default function HumanizerPage() {
     }, 100);
 
     try {
-      const res = await fetch("/api/humanize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: input, mode }),
-      });
+      const { result, improvement } = humanizeText(input, { mode });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        clearInterval(progressInterval);
-        setProgress(100);
-        setOutput(data.result);
-        setImprovement(data.improvement);
-        setPoweredBy(data.poweredBy || "AI");
-        setIsProcessing(false);
-        toast.success("Text humanized with AI!");
-        return;
-      }
-
-      setAiError(data.error || "AI humanization failed");
-      toast.error(data.error || "AI humanization failed");
+      clearInterval(progressInterval);
+      setProgress(100);
+      setOutput(result);
+      setImprovement(improvement);
+      setPoweredBy("Local Engine");
+      setIsProcessing(false);
+      toast.success("Text humanized successfully!");
     } catch (e: any) {
-      setAiError("Network error. Please check your connection and try again.");
-      toast.error("Network error. Please try again.");
+      setAiError("Humanization failed. Please try again.");
+      toast.error("Humanization failed. Please try again.");
     } finally {
       clearInterval(progressInterval);
       setIsProcessing(false);
@@ -201,7 +189,7 @@ export default function HumanizerPage() {
           transition={{ delay: 0.15, duration: 0.5 }}
         >
           <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent animate-gradient">
-            AI Humanizer
+            Text Humanizer
           </span>
         </motion.h1>
         <motion.p
@@ -210,7 +198,7 @@ export default function HumanizerPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
         >
-          Transform AI-generated text into natural, human-like writing
+          Transform text into natural, human-like writing
         </motion.p>
       </motion.div>
 
@@ -282,7 +270,7 @@ export default function HumanizerPage() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste your AI-generated text here..."
+              placeholder="Paste your text here..."
               className="flex-1 min-h-[300px] w-full resize-none rounded-xl bg-muted/30 border border-border/30 p-4 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 focus:outline-none placeholder:text-muted-foreground/40 transition-all duration-200"
             />
             <div className="flex gap-2 mt-3">
@@ -353,7 +341,7 @@ export default function HumanizerPage() {
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                       <div className="flex-1">
-                        <p className="text-sm text-red-600 dark:text-red-400 font-medium">AI Humanization Failed</p>
+                        <p className="text-sm text-red-600 dark:text-red-400 font-medium">Humanization Failed</p>
                         <p className="text-xs text-muted-foreground mt-1">{aiError}</p>
                       </div>
                     </div>
@@ -365,7 +353,7 @@ export default function HumanizerPage() {
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
                       >
                         <RefreshCw className="w-3 h-3" />
-                        Retry AI
+                        Retry
                       </motion.button>
                     </div>
                   </div>
@@ -437,12 +425,12 @@ export default function HumanizerPage() {
               {isProcessing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Humanizing...
+                  Processing...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  AI Humanize Text
+                  Humanize Text
                 </>
               )}
             </motion.button>
